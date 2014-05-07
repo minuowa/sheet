@@ -8,21 +8,21 @@ class QTreeView;
 class QWidget;
 class QMenu;
 class QMainWindow;
-class PROPERTYSHEET_EXPORT EEditorManager: public EditorActor
+class QAction;
+class PROPERTYSHEET_EXPORT EEditorManager: public QObject, public Actor
 {
     //CXDeclareSingleton(EEditorSheetManager);
+	Q_OBJECT
 public:
     EEditorManager ( void );
     ~EEditorManager ( void );
 
-	bool Init ( QMainWindow* parent );
+    bool Init ( QMainWindow* parent );
 
     QTreeView* GetPropertyView() const;
     QTreeView* GetObjectListView() const;
-	EObjectListSheet* GetObjectListSheet() const;
+    EObjectListSheet* GetObjectListSheet() const;
 
-    void SetObject ( MObject* obj );
-    void	PostEvent ( const EditorEvent&  event );
     const EditorEventArr&  GetEventArr() const;
     void ClearEvent();
     void AddGameObjType ( const char* gameobjType );
@@ -30,29 +30,39 @@ public:
     void* GetWindowProc() const;
     void ProcWindowEvent ( MSG* msg );
 
-	void InitObjectMenu (const CharStringArr& gameobjTypeArr );
-	void InitComponentMenu (const CharStringArr& componentTypeArr );
-	void SetComponentMenuState(int idx,bool checked);
-protected:
+    void InitObjectMenu ( const CharStringArr& gameobjTypeArr );
+    void InitComponentMenu ( const CharStringArr& componentTypeArr );
+    void SetComponentMenuState ( const char* componentType, bool checked, bool enabled );
+    void ResetComponentMenuState();
 
+    virtual bool OnNotify ( const EditorEvent& event );
+public slots:
+    void onAddObjectAction ( QAction* );
+    void onComponentAction ( QAction* );
+protected:
     EPropertySheet* mPropertySheet;
     EObjectListSheet* mObjectListSheet;
     EditorEventArr	mCurEventArr;
 
-	QString mCurSelectObj;
     void* mWindowProc;
-	QMainWindow* mParent;
-	QMenu* mComponentMenu;
-	QMenu* mObjectMenu;
+    QMainWindow* mParent;
+    QMenu* mComponentMenu;
+    QMenu* mObjectMenu;
+	QString mCurSelectObj;
 
 public:
+
+    inline EPropertySheet* GetPropertySheet() const
+    {
+        return mPropertySheet;
+    }
 	inline 	const QString& GetSelectObj() const
 	{
 		return mCurSelectObj;
 	}
-	inline EPropertySheet* GetPropertySheet() const
+	inline void SetSelectObj(const char* obj)
 	{
-		return mPropertySheet;
+		mCurSelectObj=obj;
 	}
 };
 

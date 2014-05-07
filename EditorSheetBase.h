@@ -32,20 +32,21 @@ struct EditorEvent
 	}
 };
 typedef CXDynaArray<EditorEvent> EditorEventArr;
-
-class EEditorWatcher
+class Watcher
 {
 public:
+	virtual ~Watcher(void);
 	virtual bool OnNotify(const EditorEvent& event);
 };
-typedef CXDynaArray<EEditorWatcher*> EEditorWatherArr;
-class EditorActor:public QObject
+typedef CXDynaArray<Watcher*> EEditorWatherArr;
+
+class Actor:public Watcher
 {
 public:
-	EditorActor(void);
-	virtual ~EditorActor(void);
-	void AddWatcher(EEditorWatcher* watcher);
-	virtual void Notify(const EditorEvent&);
+	Actor();
+	virtual ~Actor(void);
+	void AddWatcher(Watcher* watcher);
+	void Notify(const EditorEvent&);
 protected:
 	EEditorWatherArr mWatchers;
 };

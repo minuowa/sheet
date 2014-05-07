@@ -1,7 +1,7 @@
 #pragma once
 #include "EditorSheetBase.h"
-#include "EditorSheetEvent.h"
 #include "propertysheet_global.h"
+#include "..\src\corelib\kernel\qobject.h"
 class QFrame;
 class QTreeView;
 class QWidget;
@@ -10,33 +10,34 @@ class EPropertySheetDelegate;
 class QStandardItemModel;
 class QStandardItem;
 class QMenu;
+class QModelIndex;
+class QItemSelection;
 
-
-class  PROPERTYSHEET_EXPORT EObjectListSheet: public EEditorWatcher
+class  PROPERTYSHEET_EXPORT EObjectListSheet: public QObject, public Actor
 {
+	Q_OBJECT
 public:
-    EObjectListSheet ( QWidget* parent = 0, QMenu* popupMenu = 0 );
+    EObjectListSheet (QWidget *parent=0 );
     ~EObjectListSheet();
     void show();
 
-
-    QTreeView* GetView() const
-    {
-        return mTreeView;
-    }
-
-    void onSelect ( const QModelIndex& index );
 public:
     virtual bool OnNotify ( const EditorEvent& event );
+	QStandardItem* GetObj ( const char* name );
 protected:
     void AddObj ( const char* name, const char* parentName = 0 );
-
-    QStandardItem* GetObj ( const char* name );
-
-
+	void onSelect ( const QModelIndex& index );
+public slots:
+    void onSelectionChanged ( const QItemSelection &selected, const QItemSelection &deselected );
+private:
     QTreeView* mTreeView;
     QStandardItemModel* mTreeModel;
     EPropertySheetDelegate*	mDelegate;
-    EEditorEventAgent	mEditorSheetEvent;
+
+public:
+	inline QTreeView* GetView() const
+	{
+		return mTreeView;
+	}
 };
 

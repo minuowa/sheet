@@ -49,7 +49,7 @@
 #include "EPropertySheetDelegate.h"
 #include "EPropertySheetTreeItem.h"
 #include "EPropertyHelper.h"
-#include "EObject.h"
+#include "GObject.h"
 
 //! [0]
 EPropertySheetDelegate::EPropertySheetDelegate ( QObject *parent )

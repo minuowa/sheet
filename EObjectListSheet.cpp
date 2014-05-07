@@ -4,14 +4,12 @@
 #include "..\src\gui\itemviews\qstandarditemmodel.h"
 #include "EEditorSheetManager.h"
 #include "EObjListSheetTreeView.h"
-#include "EditorSheetEvent.h"
+#include "XSingleton.h"
 
-
-
-
-EObjectListSheet::EObjectListSheet ( QWidget* parent/*=0*/, QMenu* popupMenu )
+EObjectListSheet::EObjectListSheet (QWidget *parent/*=0*/ )
+	: QObject ( parent )
 {
-    mTreeView = new EObjListSheetTreeView ( parent, popupMenu );
+    mTreeView = new EObjListSheetTreeView ( parent );
     mTreeModel = new QStandardItemModel();
     mTreeView->setModel ( mTreeModel );
     mTreeView->setWindowTitle ( "Simple Tree Model" );
@@ -20,9 +18,9 @@ EObjectListSheet::EObjectListSheet ( QWidget* parent/*=0*/, QMenu* popupMenu )
     mTreeView->setSizePolicy ( sizePolicy );
 
     QItemSelectionModel* selectionModel = mTreeView->selectionModel();
-    EditorEventAgent->connect ( selectionModel,
-                                SIGNAL ( selectionChanged ( const QItemSelection &, const QItemSelection & ) ), &mEditorSheetEvent,
-                                SLOT ( onSelectionChanged ( const QItemSelection &, const QItemSelection & ) ) );
+    bool res= connect ( selectionModel, SIGNAL ( selectionChanged ( const QItemSelection &, const QItemSelection & ) ),
+		this, SLOT ( onSelectionChanged ( const QItemSelection &, const QItemSelection & ) ));
+	CXASSERT(res);
 }
 
 
@@ -62,8 +60,6 @@ void EObjectListSheet::AddObj ( const char* name, const char* parentName/*=0*/ )
 
 bool EObjectListSheet::OnNotify ( const EditorEvent& event )
 {
-    if ( !__super::OnNotify ( event ) )
-        return false;
     switch ( event.mType )
     {
     case eSceneToEditor_Add:
@@ -153,6 +149,16 @@ void EObjectListSheet::onSelect ( const QModelIndex& index )
     EditorEvent event;
     event.mType = eEditorToSecne_Select;
     event.mArgs.push_back ( var.toString().toStdString().c_str() );
-    SheetMgr->PostEvent ( event );
+    Notify(event);
+	SheetMgr->SetSelectObj(var.toString().toStdString().c_str());
+}
+
+void EObjectListSheet::onSelectionChanged( const QItemSelection &selected, const QItemSelection &deselected )
+{
+	const QModelIndexList&  indexlist = selected.indexes();
+	CXASSERT ( indexlist.size() == 1 );
+	{
+		onSelect ( indexlist.front() );
+	}
 }
 

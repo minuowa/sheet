@@ -19,23 +19,23 @@ EEditorManager::~EEditorManager ( void )
 {
 }
 
-bool EEditorManager::Init( QMainWindow* parent )
+bool EEditorManager::Init ( QMainWindow* parent )
 {
     mParent = parent;
-    mPropertySheet = new EPropertySheet ( 0 );
-    mObjectListSheet = new EObjectListSheet ( 0 );
+    mPropertySheet = new EPropertySheet ( parent );
+    mObjectListSheet = new EObjectListSheet ( parent );
 
 	AddWatcher(mObjectListSheet);
+	AddWatcher(mPropertySheet);
 
-	EditorEventAgent->setParent(mParent);
 
     mComponentMenu = new QMenu ( mParent );
-    EditorEventAgent->connect ( mComponentMenu, SIGNAL ( triggered ( QAction* ) ), EditorEventAgent, SLOT ( onComponentAction (  QAction* ) ) );
+    connect ( mComponentMenu, SIGNAL ( triggered ( QAction* ) ), this, SLOT ( onComponentAction (  QAction* ) ) );
 
-	( ( EObjListSheetTreeView* ) mObjectListSheet->GetView() )->SetPopupMenu ( mComponentMenu );
+    ( ( EObjListSheetTreeView* ) mObjectListSheet->GetView() )->SetPopupMenu ( mComponentMenu );
 
-	mObjectMenu = new QMenu ( tr("&GameObject" ));
-	mParent->menuBar()->addMenu(mObjectMenu);
+    mObjectMenu = new QMenu ( "&GameObject"  );
+    mParent->menuBar()->addMenu ( mObjectMenu );
 
     return true;
 }
@@ -52,29 +52,12 @@ QTreeView* EEditorManager::GetObjectListView() const
     return mObjectListSheet->GetView();
 }
 
-void EEditorManager::SetObject ( MObject* obj )
-{
-    mPropertySheet->SetObject ( obj );
-}
 
 const EditorEventArr& EEditorManager::GetEventArr() const
 {
     return mCurEventArr;
 }
 
-void EEditorManager::PostEvent ( const EditorEvent& event )
-{
-    switch ( event.mType )
-    {
-    case eEditorToSecne_Select:
-    {
-        const CharString& selectobj = event.mArgs[0];
-        mCurSelectObj = selectobj.c_str();
-    }
-    break;
-    }
-    mCurEventArr.push_back ( event );
-}
 
 void EEditorManager::ClearEvent()
 {
@@ -109,40 +92,89 @@ EObjectListSheet* EEditorManager::GetObjectListSheet() const
 
 
 
-void EEditorManager::InitComponentMenu( const CharStringArr& componentTypeArr )
+void EEditorManager::InitComponentMenu ( const CharStringArr& componentTypeArr )
 {
-	CharStringArr::const_iterator it ( componentTypeArr.begin() );
-	CharStringArr::const_iterator iend ( componentTypeArr.end() );
-	for ( ; it != iend; ++it )
-	{
-		const CharString& name = *it;
-		QAction* action = new QAction ( name.c_str(), this );
-		action->setCheckable ( true );
-		action->setChecked ( false );
-		mComponentMenu->addAction ( action );
-	}
+    CharStringArr::const_iterator it ( componentTypeArr.begin() );
+    CharStringArr::const_iterator iend ( componentTypeArr.end() );
+    for ( ; it != iend; ++it )
+    {
+        const CharString& name = *it;
+        QAction* action = new QAction ( name.c_str(), mParent );
+        action->setCheckable ( true );
+        action->setChecked ( false );
+        mComponentMenu->addAction ( action );
+    }
 }
 
-void EEditorManager::InitObjectMenu( const CharStringArr& gameobjTypeArr )
+void EEditorManager::InitObjectMenu ( const CharStringArr& gameobjTypeArr )
 {
-	QMenu* menu = mObjectMenu->addMenu ( "AddObject" );
-	CharStringArr::const_iterator it ( gameobjTypeArr.begin() );
-	CharStringArr::const_iterator iend ( gameobjTypeArr.end() );
-	for ( ; it != iend; ++it )
-	{
-		const CharString& name = *it;
-		menu->addAction ( name.c_str() );
-	}
-	EditorEventAgent->connect ( menu, SIGNAL ( triggered ( QAction* ) ), EditorEventAgent, SLOT ( onAddObjectAction (  QAction* ) ) );
+    QMenu* menu = mObjectMenu->addMenu ( "AddObject" );
+    CharStringArr::const_iterator it ( gameobjTypeArr.begin() );
+    CharStringArr::const_iterator iend ( gameobjTypeArr.end() );
+    for ( ; it != iend; ++it )
+    {
+        const CharString& name = *it;
+        menu->addAction ( name.c_str() );
+    }
+    connect ( menu, SIGNAL ( triggered ( QAction* ) ), this, SLOT ( onAddObjectAction (  QAction* ) ) );
 }
 
-void EEditorManager::SetComponentMenuState( int idx,bool checked )
+void EEditorManager::SetComponentMenuState ( const char* componentType, bool checked, bool enabled )
 {
-	assert ( mComponentMenu );
-	QList<QAction*> actionList = mComponentMenu->actions();
-	int cnt = actionList.count();
-	CXASSERT_RETURN ( idx < cnt );
-	QAction* act = actionList[idx];
-	CXASSERT_RETURN ( act );
-	act->setChecked ( checked );
+    assert ( mComponentMenu );
+    QList<QAction*> actionList = mComponentMenu->actions();
+    int cnt = actionList.count();
+
+    for ( int i = 0; i < cnt; ++i )
+    {
+        QAction* action = actionList[i];
+        if ( action->text() == componentType )
+        {
+            action->setChecked ( checked );
+            action->setEnabled ( enabled );
+        }
+    }
+}
+
+void EEditorManager::ResetComponentMenuState()
+{
+    assert ( mComponentMenu );
+    QList<QAction*> actionList = mComponentMenu->actions();
+    int cnt = actionList.count();
+
+    for ( int i = 0; i < cnt; ++i )
+    {
+        QAction* action = actionList[i];
+        action->setChecked ( false );
+        action->setEnabled ( true );
+    }
+}
+
+bool EEditorManager::OnNotify( const EditorEvent& event )
+{
+	Notify(event);
+	return true;
+}
+
+
+void EEditorManager::onAddObjectAction ( QAction* action )
+{
+	QString typeName = action->text();
+
+	EditorEvent event;
+	event.mType = eEditorToScene_Add;
+	event.mArgs.push_back ( typeName.toStdString().c_str() );
+	Notify(event);
+}
+
+void EEditorManager::onComponentAction ( QAction* action )
+{
+	QString componentTypeName = action->text();
+	const QString& name = GetSelectObj();
+	EditorEvent editorevent;
+	editorevent.mType = action->isChecked() ? eEditorToScene_ComponentAttach
+		: eEditorToScene_ComponentDettach;
+	editorevent.mArgs.push_back ( CharString ( name.toStdString().c_str() ) );
+	editorevent.mArgs.push_back ( CharString ( componentTypeName.toStdString().c_str() ) );
+	Notify( editorevent );
 }

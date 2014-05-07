@@ -5,9 +5,9 @@
 #include "QMenu.h"
 
 
-EObjListSheetTreeView::EObjListSheetTreeView ( QWidget *parent /*= 0*/, QMenu* popmenu/*=0 */ )
+EObjListSheetTreeView::EObjListSheetTreeView ( QWidget *parent/* = 0*/)
     : QTreeView ( parent )
-    , mPopupMenu ( popmenu )
+    , mPopupMenu ( 0 )
 {
     setContextMenuPolicy ( Qt::ActionsContextMenu );
 }

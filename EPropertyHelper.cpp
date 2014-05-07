@@ -1,5 +1,5 @@
 #include "EPropertyHelper.h"
-#include "EObject.h"
+#include "GObject.h"
 
 bool EPropertyHelper::WriteProperty ( void*& data,QSpinBox* editor )
 {

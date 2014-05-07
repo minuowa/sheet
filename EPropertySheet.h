@@ -2,7 +2,7 @@
 #define PROPERTYSHEET_H
 
 #include "propertysheet_global.h"
-#include "EObject.h"
+#include "GObject.h"
 #include "EditorSheetBase.h"
 
 class QFrame;
@@ -12,16 +12,17 @@ class TreeModel;
 class EPropertySheetDelegate;
 class QStandardItemModel;
 class QStandardItem;
-class PROPERTYSHEET_EXPORT EPropertySheet: public EEditorWatcher
+class PROPERTYSHEET_EXPORT EPropertySheet: public QObject,public Actor
 {
+	Q_OBJECT
 public:
     EPropertySheet ( QWidget* parent = 0 );
     ~EPropertySheet();
     void ClearPropertyies();
-    template<typename T>
-    void AddProperty ( const char* categoryName, const char* propName );
+    void AddProperty ( const char* categoryName, const char* propName,EPropertyVar* propVar );
+	//void SetCategoryCount(int cnt);
     void show();
-    void SetObject ( MObject* obj );
+    void SetObject ( GObject* obj );
     QTreeView* GetView() const
     {
         return mTreeView;

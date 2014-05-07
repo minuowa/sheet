@@ -35,9 +35,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="EObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="EPropertyHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -65,36 +62,39 @@
     <ClCompile Include="GeneratedFiles\Debug\moc_EPropertySheetDelegate.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="EditorSheetEvent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_EditorSheetEvent.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_EditorSheetEvent.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="EObjListSheetTreeView.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_EEditorSheetManager.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_EEditorSheetManager.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_EPropertySheet.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_EPropertySheet.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_EObjectListSheet.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_EObjectListSheet.cpp">
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="propertysheet_global.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EPropertyHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EditorSheetBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EObjectListSheet.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EEditorSheetManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EPropertySheetTreeItem.h">
@@ -106,6 +106,9 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="EPropertySheet.h">
@@ -114,7 +117,10 @@
     <CustomBuild Include="EPropertySheetDelegate.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="EditorSheetEvent.h">
+    <CustomBuild Include="EEditorSheetManager.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="EObjectListSheet.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
